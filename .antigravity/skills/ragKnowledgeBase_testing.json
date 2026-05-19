@@ -1,0 +1,177 @@
+{
+    "ragKnowledgeBase_testing": {
+        "metadata": {
+            "topic": "Statistical Process Control (SPC) & Capability Analysis",
+            "purpose": "Unit testing and validation of R/Python statistical code",
+            "version": "1.1.0"
+        },
+        "statisticalConstants": {
+            "unbiasingConstantD2": [
+                {
+                    "subgroupSize": 2,
+                    "value": 1.128,
+                    "description": "Typisch fuer Regelkarten fuer Einzelwerte und gleitende Spannweiten (I-MR)"
+                },
+                {
+                    "subgroupSize": 3,
+                    "value": 1.693
+                },
+                {
+                    "subgroupSize": 5,
+                    "value": 2.326
+                }
+            ]
+        },
+        "calculationFormulas": {
+            "standardDeviationWithin": "sigma_within = R_bar / d2",
+            "ppmObserved": {
+                "lowerSpecificationLimit": "1000000 * (count(x < LSL) / n)",
+                "upperSpecificationLimit": "1000000 * (count(x > USL) / n)"
+            },
+            "ppmExpectedWithin": {
+                "lowerSpecificationLimit": "1000000 * P(Z < (LSL - mean) / sigma_within)",
+                "upperSpecificationLimit": "1000000 * P(Z > (USL - mean) / sigma_within)"
+            },
+            "ppmExpectedOverall": {
+                "lowerSpecificationLimit": "1000000 * P(Z < (LSL - mean) / sigma_overall)",
+                "upperSpecificationLimit": "1000000 * P(Z > (USL - mean) / sigma_overall)"
+            }
+        },
+        "statisticalTestCases": [
+            {
+                "testCaseId": "TC_01",
+                "topic": "processCapability",
+                "name": "Normalverteilte Prozessfaehigkeit",
+                "source": "BMW GS 98000",
+                "inputParameters": {
+                    "targetValue": 56.830,
+                    "tolerance": 0.0040,
+                    "sampleSizeTotal": 50,
+                    "minValue": 56.829,
+                    "maxValue": 56.831,
+                    "range": 0.0022
+                },
+                "intermediateValues": {
+                    "mean": 56.830,
+                    "standardDeviation": 0.0004,
+                    "processSpread6Sigma": 0.0025
+                },
+                "expectedResults": {
+                    "cp": 1.585,
+                    "cpConfidenceInterval": [
+                        1.272,
+                        1.898
+                    ],
+                    "cpk": 1.482,
+                    "cpkConfidenceInterval": [
+                        1.175,
+                        1.790
+                    ],
+                    "isCapableAndStable": true,
+                    "evaluationRequirement": {
+                        "requiredCpk": 1.442,
+                        "minimumCpkThreshold": 1.33
+                    }
+                }
+            },
+            {
+                "testCaseId": "TC_02",
+                "topic": "processCapabilityNonNormal",
+                "name": "Nicht-normale Prozessfaehigkeit / Mischverteilung",
+                "source": "AIAG-VDA",
+                "inputParameters": {
+                    "featureId": 3,
+                    "featureType": "Distanz",
+                    "lowerSpecificationLimit": 29.860,
+                    "upperSpecificationLimit": 30.140,
+                    "targetValueTm": 30.000,
+                    "sampleSizeTotal": 500,
+                    "subgroupSize": 5
+                },
+                "intermediateValues": {
+                    "medianX50": 30.00923,
+                    "quantile0_135": 29.92544,
+                    "quantile99_865": 30.08731,
+                    "totalSpread": 0.16188
+                },
+                "expectedResults": {
+                    "cpG": 1.73,
+                    "cpGConfidenceInterval": [
+                        1.62,
+                        1.84
+                    ],
+                    "cpkG": 1.67,
+                    "cpkGConfidenceInterval": [
+                        1.57,
+                        1.78
+                    ],
+                    "partsPerMillion": 0.0
+                }
+            },
+            {
+                "testCaseId": "TC_03",
+                "topic": "capabilityComparison",
+                "name": "Vergleich von Lage und Streuung bei gleichem Cpk",
+                "source": "AIAG-VDA",
+                "scenarios": [
+                    {
+                        "scenarioId": "S1",
+                        "condition": "Zentrierter Prozess",
+                        "inputParameters": {
+                            "mean": 0.166,
+                            "standardDeviation": 0.0457
+                        },
+                        "expectedResults": {
+                            "cp": 1.46,
+                            "cpk": 1.71
+                        }
+                    },
+                    {
+                        "scenarioId": "S2",
+                        "condition": "Off-Center Prozess",
+                        "inputParameters": {
+                            "mean": 0.250,
+                            "standardDeviation": 0.0292
+                        },
+                        "expectedResults": {
+                            "cp": 2.28,
+                            "cpk": 1.71
+                        }
+                    }
+                ]
+            },
+            {
+                "testCaseId": "TC_04",
+                "topic": "geometricDimensioning",
+                "name": "Positionsabweichung und MMVS",
+                "source": "AIAG-VDA",
+                "inputParameters": {
+                    "holeDiameterLD": 20.0,
+                    "positionalToleranceTP": 0.2
+                },
+                "intermediateValues": {
+                    "formula": "MMVS = MMS - T"
+                },
+                "expectedResults": {
+                    "maximumMaterialVirtualSize": 19.8
+                }
+            },
+            {
+                "testCaseId": "TC_05",
+                "topic": "defectRateConversion",
+                "name": "PPM-Berechnung aus Z-Wert",
+                "source": "AIAG Appendix I",
+                "inputParameters": {
+                    "zValue": 3.00
+                },
+                "intermediateValues": {
+                    "areaFractionPz": 0.9986501,
+                    "outOfBoundsFraction": 0.00135
+                },
+                "expectedResults": {
+                    "partsPerMillion": 1350
+                }
+            }
+        ]
+    }
+}

@@ -1,0 +1,353 @@
+{
+    "knowledgeBaseContext_phyton_vizualization": {
+        "domain": "statisticalProcessControlAndAdvancedAnalytics",
+        "architecture": "rCalculationBackendWithPythonVisualizationFrontend",
+        "systemRole": "pythonAsPureRenderEngine",
+        "referenceStandards": [
+            "aiagSpcManual2ndEdition",
+            "aiagVdaSpcYellowVolume"
+        ],
+        "referenceSoftwareToReplicate": "minitab"
+    },
+    "spcAiagVdaStandard": {
+        "variablesControlCharts": [
+            {
+                "methodName": "xBarRChart",
+                "statisticalContext": {
+                    "purpose": "monitoringProcessLocationAndVariation",
+                    "sampleSizeConstraint": "n<=10",
+                    "metrics": [
+                        "mean",
+                        "range"
+                    ]
+                },
+                "rCalculationBackendInterface": {
+                    "xAxisSampleIds": "vectorOfTimestampsOrIds",
+                    "yAxisMeans": "vectorOfSubgroupMeans",
+                    "yAxisRanges": "vectorOfSubgroupRanges",
+                    "centerLines": "dictionaryWithMeanOfMeansAndMeanOfRanges",
+                    "controlLimits": "dictionaryWithUclAndLclVectorsForMeansAndRanges",
+                    "outlierRuleViolations": "booleanMatrixForWesternElectricRules"
+                },
+                "pythonVisualizationFrontend": {
+                    "primaryLibrary": "plotly.subplots",
+                    "plotParadigm": "dualVerticalTimeSeriesPlot",
+                    "renderElements": [
+                        "scatterTraceWithLinesAndMarkersForData",
+                        "horizontalLineShapesForCenterLines",
+                        "stepLineTracesForControlLimits",
+                        "redMarkerOverlayForRuleViolations"
+                    ]
+                }
+            },
+            {
+                "methodName": "xBarSChart",
+                "statisticalContext": {
+                    "purpose": "preciseVariationEstimationForLargerSubgroups",
+                    "sampleSizeConstraint": "n>10",
+                    "metrics": [
+                        "mean",
+                        "standardDeviation"
+                    ]
+                },
+                "rCalculationBackendInterface": {
+                    "xAxisSampleIds": "vectorOfTimestampsOrIds",
+                    "yAxisMeans": "vectorOfSubgroupMeans",
+                    "yAxisStdDevs": "vectorOfSubgroupStdDevs",
+                    "centerLines": "dictionaryWithMeanOfMeansAndMeanOfStdDevs",
+                    "controlLimits": "dictionaryWithUclAndLclVectorsForMeansAndStdDevs"
+                },
+                "pythonVisualizationFrontend": {
+                    "primaryLibrary": "plotly.subplots",
+                    "plotParadigm": "dualVerticalTimeSeriesPlot",
+                    "renderElements": [
+                        "scatterTraceWithLinesAndMarkers",
+                        "axhlineForCenterLinesAndLimits"
+                    ]
+                }
+            },
+            {
+                "methodName": "iMrChart",
+                "statisticalContext": {
+                    "purpose": "monitoringChemicalBatchesOrDestructiveTesting",
+                    "sampleSizeConstraint": "n=1",
+                    "metrics": [
+                        "individualValues",
+                        "movingRange"
+                    ]
+                },
+                "rCalculationBackendInterface": {
+                    "xAxisSampleIds": "vectorOfTimestampsOrIds",
+                    "yAxisIndividuals": "vectorOfIndividualMeasurements",
+                    "yAxisMovingRanges": "vectorOfAbsoluteDifferencesToPrevious",
+                    "centerLines": "dictionaryWithMeanAndMeanMovingRange",
+                    "controlLimits": "dictionaryWithUclAndLclVectors"
+                },
+                "pythonVisualizationFrontend": {
+                    "primaryLibrary": "matplotlib.pyplot",
+                    "plotParadigm": "twoSubplotsSharedXAxis",
+                    "renderElements": [
+                        "plotWithMarkerO",
+                        "axhlineForLimitsWithLabeling"
+                    ]
+                }
+            }
+        ],
+        "attributesControlCharts": [
+            {
+                "methodName": "pChartAndNpChart",
+                "statisticalContext": {
+                    "purpose": "fractionOrNumberOfNonConformingUnits",
+                    "sampleSizeConstraint": "variableForPConstantForNp",
+                    "distribution": "binomial"
+                },
+                "rCalculationBackendInterface": {
+                    "xAxisSampleIds": "vectorOfIds",
+                    "yAxisDefectProportionsOrCounts": "vectorOfCalculatedMetrics",
+                    "centerLine": "scalarOverallProportionOrCount",
+                    "controlLimits": "vectorsForUclAndLclVariablePerSample"
+                },
+                "pythonVisualizationFrontend": {
+                    "primaryLibrary": "plotly.graph_objects",
+                    "plotParadigm": "interactiveLineChartWithVariableLimits",
+                    "renderElements": [
+                        "scatterTraceForData",
+                        "staircaseLineTraceForVariableControlLimits"
+                    ]
+                }
+            },
+            {
+                "methodName": "uChartAndCChart",
+                "statisticalContext": {
+                    "purpose": "numberOfDefectsPerUnitOrTotal",
+                    "sampleSizeConstraint": "variableForUConstantForC",
+                    "distribution": "poisson"
+                },
+                "rCalculationBackendInterface": {
+                    "xAxisSampleIds": "vectorOfIds",
+                    "yAxisDefectRatesOrCounts": "vectorOfCalculatedMetrics",
+                    "centerLine": "scalarOverallRateOrCount",
+                    "controlLimits": "vectorsForUclAndLcl"
+                },
+                "pythonVisualizationFrontend": {
+                    "primaryLibrary": "matplotlib.pyplot",
+                    "plotParadigm": "poissonControlChart",
+                    "renderElements": [
+                        "plotWithMarkers",
+                        "stepForVariableLimitsOrAxhlineForConstantLimits"
+                    ]
+                }
+            }
+        ],
+        "processCapabilityAndPerformance": {
+            "methodName": "capabilitySixpackAndIndices",
+            "statisticalContext": {
+                "purpose": "comparingProcessVariationToCustomerSpecifications",
+                "metrics": [
+                    "Cp",
+                    "Cpk",
+                    "Pp",
+                    "Ppk",
+                    "Pm",
+                    "Pmk",
+                    "isoPercentiles"
+                ]
+            },
+            "rCalculationBackendInterface": {
+                "sixpackData": {
+                    "xBarChartData": "vectorsForMeansAndLimits",
+                    "rChartData": "vectorsForRangesAndLimits",
+                    "runChartLast25": "vectorOfLast25Observations",
+                    "histogramData": "dictionaryWithBinEdgesAndFrequencies",
+                    "theoreticalDensityCurve": "vectorsForXAndYOfFittedDistribution",
+                    "probabilityPlotData": "vectorsForEmpiricalAndTheoreticalQuantiles",
+                    "capabilityPlotData": "scalarsForOverallAndWithinVariationSpread"
+                },
+                "specifications": "dictionaryWithLslUslAndTarget",
+                "calculatedIndices": "dictionaryOfCalculatedValuesForTextTable"
+            },
+            "pythonVisualizationFrontend": {
+                "primaryLibrary": "matplotlib.gridspec",
+                "plotParadigm": "dashboardWith2x3Grid",
+                "renderElements": [
+                    "subplot1XBarChart",
+                    "subplot2RChart",
+                    "subplot3RunChart",
+                    "subplot4HistogramWithOverlaidLinePlotForDensityAndAxvlinesForSpecs",
+                    "subplot5ScatterPlotWithReferenceLineForProbabilityNet",
+                    "subplot6HorizontalLineSegmentsForCapabilitySpreadVersusSpecs",
+                    "textTableOverlayForCalculatedIndices"
+                ]
+            }
+        },
+        "advancedControlAndDiagnostics": [
+            {
+                "methodName": "timeWeightedChartsCusumEwma",
+                "statisticalContext": {
+                    "purpose": "rapidDetectionOfSmallProcessShifts"
+                },
+                "rCalculationBackendInterface": {
+                    "xAxisSampleIds": "vectorOfIds",
+                    "yAxisWeightedStatistics": "vectorOfEwmaOrCusumCalculations",
+                    "centerLine": "scalarTargetValue",
+                    "controlLimits": "vectorsForDynamicLimitsBasedOnWeighting"
+                },
+                "pythonVisualizationFrontend": {
+                    "primaryLibrary": "plotly.graph_objects",
+                    "plotParadigm": "interactiveTimeSeriesWithDynamicBands",
+                    "renderElements": [
+                        "scatterTrace",
+                        "fillToZeroYForCusumDrift",
+                        "continuousBandsForEwmaLimits"
+                    ]
+                }
+            },
+            {
+                "methodName": "multivariateChartsT2Hotelling",
+                "statisticalContext": {
+                    "purpose": "simultaneousMonitoringOfCorrelatedCharacteristics"
+                },
+                "rCalculationBackendInterface": {
+                    "t2StatisticValues": "vectorOfCalculatedT2ValuesPerSample",
+                    "t2UpperControlLimit": "scalarUclBasedOnFDistribution",
+                    "scatterMatrixCoordinates": "matrixOfRawCorrelatedData",
+                    "confidenceEllipses": "matrixOfXAndYCoordinatesForEllipsePaths"
+                },
+                "pythonVisualizationFrontend": {
+                    "primaryLibrary": "seaborn",
+                    "plotParadigm": "t2ControlChartPlusScatterMatrix",
+                    "renderElements": [
+                        "lineChartForT2ValuesWithUclLine",
+                        "snsPairplotForRawData",
+                        "matplotlibPolygonPatchForConfidenceEllipses"
+                    ]
+                }
+            }
+        ]
+    },
+    "minitabAnalyticsVisualizations": {
+        "descriptiveStatisticsAndHypothesisTesting": [
+            {
+                "methodName": "graphicalSummaryAndAndersonDarling",
+                "rCalculationBackendInterface": {
+                    "histogramBinsAndCounts": "vectorsForHistogram",
+                    "densityCurve": "vectorsForXAndY",
+                    "boxplotStats": "dictionaryWithQ1MedianQ3Whiskers",
+                    "confidenceIntervals": "dictionaryWithMeanCiAndMedianCi",
+                    "andersonDarlingStats": "dictionaryWithA2ValueAndPValue",
+                    "descriptiveTable": "dictionaryWithMeanStdDevVarianceSkewnessKurtosis"
+                },
+                "pythonVisualizationFrontend": {
+                    "primaryLibrary": "matplotlib.pyplot",
+                    "plotParadigm": "combinedSummaryReport",
+                    "renderElements": [
+                        "barPlotForHistogramWithLineOverlay",
+                        "horizontalBoxplotAlignedWithHistogramXAxis",
+                        "errorbarPlotsForConfidenceIntervalsBelowBoxplot",
+                        "textBoxesForStatisticalTablesAndPValues"
+                    ]
+                }
+            }
+        ],
+        "measurementSystemAnalysisMsa": {
+            "methodName": "gageRnRCrossedAndNested",
+            "rCalculationBackendInterface": {
+                "varianceComponentsBarData": "vectorsForCategoriesAndPercentageContributions",
+                "rChartByOperatorData": "vectorsForRangesGroupedByOperator",
+                "xBarChartByOperatorData": "vectorsForMeansGroupedByOperator",
+                "measurementsByPartData": "vectorsForRawDataGroupedByPartId",
+                "operatorPartInteractionData": "matrixOfMeansAcrossOperatorAndPartCombos"
+            },
+            "pythonVisualizationFrontend": {
+                "primaryLibrary": "matplotlib.gridspec",
+                "plotParadigm": "msaSixpackDashboard",
+                "renderElements": [
+                    "stackedBarChartForVarianceComponents",
+                    "groupedScatterPlotsForXBarAndRChartsWithFacetGridLogic",
+                    "boxplotsForMeasurementsByPart",
+                    "boxplotsForMeasurementsByOperator",
+                    "interactionLinePlotsConnectingMeansOfPartsAcrossOperators"
+                ]
+            }
+        },
+        "regressionAndCorrelation": {
+            "methodName": "fittedLinePlotAndResiduals",
+            "rCalculationBackendInterface": {
+                "scatterData": "vectorsForXAndY",
+                "regressionEquation": "stringRepresentationOfModel",
+                "fittedLineCoordinates": "vectorsForXAndPredictedY",
+                "confidenceAndPredictionBands": "vectorsForUpperAndLowerBounds",
+                "residualsData": "vectorOfCalculatedResiduals",
+                "theoreticalQuantilesForResiduals": "vectorOfQuantilesForNormalityCheck"
+            },
+            "pythonVisualizationFrontend": {
+                "primaryLibrary": "seaborn",
+                "plotParadigm": "regressionWithFourInOneResidualPlots",
+                "renderElements": [
+                    "snsScatterplotWithLinePlotForFit",
+                    "fillBetweenForConfidenceBands",
+                    "textBoxForRegressionEquationAndRSquared",
+                    "gridForResidualsNormalProbabilityPlotHistogramVersusFitsAndVersusOrder"
+                ]
+            }
+        },
+        "anova": {
+            "methodName": "oneWayAnovaAndTukeyPostHoc",
+            "rCalculationBackendInterface": {
+                "groupData": "dictionaryOfVectorsPerFactorLevel",
+                "groupMeansAndCis": "dictionaryOfMeansAndConfidenceIntervalLimits",
+                "tukeySignificantDifferences": "matrixOfPValuesForPairwiseComparisons"
+            },
+            "pythonVisualizationFrontend": {
+                "primaryLibrary": "seaborn",
+                "plotParadigm": "intervalPlotWithGrouping",
+                "renderElements": [
+                    "snsPointplotForMeansWithErrorbarsForCis",
+                    "snsSwarmplotForRawDataOverlay",
+                    "textAnnotationsForTukeyGroupingLetters"
+                ]
+            }
+        },
+        "designOfExperimentsDoe": {
+            "methodName": "factorialAndResponseSurfaceDesigns",
+            "rCalculationBackendInterface": {
+                "paretoEffectsData": "vectorsForStandardizedEffectSizesAndLabels",
+                "paretoSignificanceThreshold": "scalarTValueForAlpha",
+                "mainEffectsMeans": "vectorsForMeansAtLowAndHighLevels",
+                "interactionEffectsMatrix": "matrixOfMeansForFactorCrossings",
+                "surfacePlotGrid": "matricesForXMeshYMeshAndZPredicted"
+            },
+            "pythonVisualizationFrontend": {
+                "primaryLibrary": "plotly.graph_objects",
+                "secondaryLibrary": "matplotlib.pyplot",
+                "plotParadigm": "multiPlotDoeAnalysis",
+                "renderElements": [
+                    "horizontalBarChartForParetoWithAxvlineForThreshold",
+                    "linePlotsForMainEffects",
+                    "nonParallelLinePlotsForInteractions",
+                    "plotlySurfaceFor3dResponseOptimization",
+                    "plotlyContourFor2dProjection"
+                ]
+            }
+        },
+        "reliabilityAndSurvivalAnalysis": {
+            "methodName": "distributionIDAndKaplanMeier",
+            "rCalculationBackendInterface": {
+                "survivalFunctionCoordinates": "vectorsForTimeAndProbability",
+                "censoredEventCoordinates": "vectorsForTimeOfRightCensoredData",
+                "weibullProbabilityPlot": "vectorsForTransformedTimeAndTransformedProbability",
+                "referenceLineCoordinates": "vectorsForXAndYOfFittedDistribution"
+            },
+            "pythonVisualizationFrontend": {
+                "primaryLibrary": "matplotlib.pyplot",
+                "plotParadigm": "stepFunctionsAndLogLogPlots",
+                "renderElements": [
+                    "stepPlotWithPostFormattingForKaplanMeier",
+                    "scatterOverlayWithCrossMarkersForCensoredEvents",
+                    "scatterPlotOnLogLogScaledAxesForWeibullNet",
+                    "linePlotForDistributionReferenceLine"
+                ]
+            }
+        }
+    }
+}

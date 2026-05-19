@@ -1,0 +1,337 @@
+{
+    "spcKnowledgeBase Lookup Tables": {
+        "metadata": {
+            "sources": [
+                "AIAG SPC Manual (2nd Edition)",
+                "AIAG-VDA SPC Yellow Volume",
+                "357266802-SPC-pdf.pdf"
+            ],
+            "purpose": "Fixed look-up table and formulas for calculating statistical process control (SPC) limits and process capability indices."
+        },
+        "controlChartFactors": [
+            {
+                "n": 2,
+                "a2": 1.880,
+                "d2": 1.128,
+                "d3": null,
+                "d4": 3.267,
+                "a3": 0.7979,
+                "c4": null,
+                "b3": null,
+                "b4": 3.267
+            },
+            {
+                "n": 3,
+                "a2": 1.023,
+                "d2": 1.693,
+                "d3": null,
+                "d4": 2.574,
+                "a3": 0.8862,
+                "c4": null,
+                "b3": null,
+                "b4": 2.568
+            },
+            {
+                "n": 4,
+                "a2": 0.729,
+                "d2": 2.059,
+                "d3": null,
+                "d4": 2.282,
+                "a3": 0.9213,
+                "c4": null,
+                "b3": null,
+                "b4": 2.266
+            },
+            {
+                "n": 5,
+                "a2": 0.577,
+                "d2": 2.326,
+                "d3": null,
+                "d4": 2.114,
+                "a3": 0.9400,
+                "c4": null,
+                "b3": null,
+                "b4": 2.089
+            },
+            {
+                "n": 6,
+                "a2": 0.483,
+                "d2": 2.534,
+                "d3": null,
+                "d4": 2.004,
+                "a3": 0.9515,
+                "c4": null,
+                "b3": 0.030,
+                "b4": 1.970
+            },
+            {
+                "n": 7,
+                "a2": 0.419,
+                "d2": 2.704,
+                "d3": 0.076,
+                "d4": 1.924,
+                "a3": 0.9594,
+                "c4": null,
+                "b3": 0.118,
+                "b4": 1.882
+            },
+            {
+                "n": 8,
+                "a2": 0.373,
+                "d2": 2.847,
+                "d3": 0.136,
+                "d4": 1.864,
+                "a3": 1.0990,
+                "c4": 0.9650,
+                "b3": 0.185,
+                "b4": 1.815
+            },
+            {
+                "n": 9,
+                "a2": 0.337,
+                "d2": 2.970,
+                "d3": 0.184,
+                "d4": 1.816,
+                "a3": 1.0320,
+                "c4": 0.9693,
+                "b3": 0.239,
+                "b4": 1.761
+            },
+            {
+                "n": 10,
+                "a2": 0.308,
+                "d2": 3.078,
+                "d3": 0.223,
+                "d4": 1.777,
+                "a3": 0.9750,
+                "c4": 0.9727,
+                "b3": 0.284,
+                "b4": 1.716
+            },
+            {
+                "n": 15,
+                "a2": 0.223,
+                "d2": 3.472,
+                "d3": 0.347,
+                "d4": 1.653,
+                "a3": 0.7890,
+                "c4": 0.9823,
+                "b3": 0.428,
+                "b4": 1.572
+            },
+            {
+                "n": 20,
+                "a2": 0.180,
+                "d2": 3.735,
+                "d3": 0.415,
+                "d4": 1.585,
+                "a3": 0.6800,
+                "c4": 0.9869,
+                "b3": 0.510,
+                "b4": 1.490
+            },
+            {
+                "n": 25,
+                "a2": 0.153,
+                "d2": 3.931,
+                "d3": 0.459,
+                "d4": 1.541,
+                "a3": 0.6060,
+                "c4": 0.9896,
+                "b3": 0.565,
+                "b4": 1.435
+            }
+        ],
+        "standardNormalDistribution": {
+            "sigmaLevels": [
+                {
+                    "zValue": 1.0,
+                    "defectPercentage": 15.87,
+                    "ppm": 158655
+                },
+                {
+                    "zValue": 1.5,
+                    "defectPercentage": 6.68,
+                    "ppm": 66807
+                },
+                {
+                    "zValue": 2.0,
+                    "defectPercentage": 2.28,
+                    "ppm": 22750
+                },
+                {
+                    "zValue": 3.0,
+                    "defectPercentage": 0.135,
+                    "ppm": 1350
+                },
+                {
+                    "zValue": 4.0,
+                    "defectPercentage": 0.0032,
+                    "ppm": 32
+                },
+                {
+                    "zValue": 4.5,
+                    "defectPercentage": 0.00034,
+                    "ppm": 3.4
+                },
+                {
+                    "zValue": 6.0,
+                    "defectPercentage": 0.0,
+                    "ppm": 0.0
+                }
+            ]
+        },
+        "machineCapabilityTargets": [
+            {
+                "featureClass": "Critical",
+                "nGreaterThanOrEqual50": {
+                    "pm": 2.33,
+                    "pmk": 2.00
+                },
+                "n45": null,
+                "n40": null,
+                "n35": null,
+                "n30": null
+            },
+            {
+                "featureClass": "Major",
+                "nGreaterThanOrEqual50": {
+                    "pm": 2.00,
+                    "pmk": 1.67
+                },
+                "n45": {
+                    "pm": 2.06,
+                    "pmk": 1.72
+                },
+                "n40": {
+                    "pm": 2.13,
+                    "pmk": 1.78
+                },
+                "n35": {
+                    "pm": 2.22,
+                    "pmk": 1.86
+                },
+                "n30": {
+                    "pm": 2.35,
+                    "pmk": 1.96
+                }
+            },
+            {
+                "featureClass": "Minor",
+                "nGreaterThanOrEqual50": {
+                    "pm": 1.67,
+                    "pmk": 1.33
+                },
+                "n45": {
+                    "pm": 1.72,
+                    "pmk": 1.37
+                },
+                "n40": {
+                    "pm": 1.78,
+                    "pmk": 1.42
+                },
+                "n35": {
+                    "pm": 1.86,
+                    "pmk": 1.48
+                },
+                "n30": {
+                    "pm": 1.96,
+                    "pmk": 1.56
+                }
+            },
+            {
+                "featureClass": "Others",
+                "nGreaterThanOrEqual50": {
+                    "pm": 1.00,
+                    "pmk": 1.00
+                },
+                "n45": {
+                    "pm": 1.03,
+                    "pmk": 1.03
+                },
+                "n40": {
+                    "pm": 1.07,
+                    "pmk": 1.07
+                },
+                "n35": {
+                    "pm": 1.11,
+                    "pmk": 1.11
+                },
+                "n30": {
+                    "pm": 1.18,
+                    "pmk": 1.18
+                }
+            }
+        ],
+        "additionalRChartConstants": [
+            {
+                "n": 2,
+                "d2": 1.128,
+                "d3": 0.8525
+            },
+            {
+                "n": 3,
+                "d2": 1.693,
+                "d3": 0.8884
+            },
+            {
+                "n": 4,
+                "d2": 2.059,
+                "d3": 0.8798
+            },
+            {
+                "n": 5,
+                "d2": 2.326,
+                "d3": 0.8641
+            },
+            {
+                "n": 10,
+                "d2": 3.078,
+                "d3": 0.7971
+            }
+        ],
+        "medianChartConstants": [
+            {
+                "n": 2,
+                "cn": 1.000,
+                "d2": 1.128
+            },
+            {
+                "n": 3,
+                "cn": 1.160,
+                "d2": 1.693
+            },
+            {
+                "n": 4,
+                "cn": 1.092,
+                "d2": 2.059
+            },
+            {
+                "n": 5,
+                "cn": 1.198,
+                "d2": 2.326
+            },
+            {
+                "n": 10,
+                "cn": 1.175,
+                "d2": 3.078
+            }
+        ],
+        "formulas": {
+            "capabilityWithin": {
+                "index": "Cpk",
+                "description": "Nutzt sigma_within, geschätzt über Teilgruppen.",
+                "formula": "min((USL - mu) / (3 * sigma_within), (mu - LSL) / (3 * sigma_within))",
+                "sigmaEstimation": "R_bar / d2"
+            },
+            "capabilityOverall": {
+                "index": "Ppk",
+                "description": "Nutzt die Gesamt-Standardabweichung (s) aller Datenpunkte.",
+                "formula": "min((USL - x_bar) / (3 * s), (x_bar - LSL) / (3 * s))"
+            },
+            "approximations": {
+                "d2ForNGreaterThan25": "sqrt(2n - 1) - 0.5"
+            }
+        }
+    }
+}

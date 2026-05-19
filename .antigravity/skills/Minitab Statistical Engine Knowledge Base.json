@@ -1,0 +1,372 @@
+{
+    "rag_knowledge_base": {
+        "domain": "Comprehensive Minitab Statistical Engine Exact Replication",
+        "backend_language": "R",
+        "version": "8.0_Antigravity_Agent_Max_Knowledge",
+        "framework_specification": "Designed for deterministic RAG-driven AI Agent chains requiring exact analytical alignment with Minitab down to the last decimal place.",
+        "global_voraussetzungen": {
+            "r_environment_setup": "options(contrasts = c('contr.sum', 'contr.poly'))",
+            "critical_warning": "CRITICAL: Diese globale Kontrasteinstellung MUSS vor jeder Modellanpassung (lm, aov, glm) in R erzwungen werden. Andernfalls verwenden lineare S3/R6-Klassen standardmäßig Behandlungs-Kontraste ('contr.treatment'), wodurch Typ-III-Quadratsummen bei unbalancierten Datensätzen mathematisch verzerrt werden und die Minitab-Ergebnisse verfehlen."
+        },
+        "categories": [
+            {
+                "category_id": "1",
+                "category_name": "Deskriptive Statistik und Grafiken",
+                "functions": [
+                    {
+                        "name": "Arithmetischer Mittelwert (Mean)",
+                        "must_have_packages": [
+                            "base"
+                        ],
+                        "exact_r_code": "mean_val <- mean(x, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "na.rm": "TRUE (Minitab führt standardmäßig ein Listwise Deletion für fehlende Werte durch)"
+                        },
+                        "nice_to_have_extensions": {
+                            "trimmed_mean": "mean(x, trim = 0.05, na.rm = TRUE) # Entspricht Minitabs 5% gestutztem Mittelwert"
+                        },
+                        "attention_minitab_quirks": "Minitab ignoriert Zeilen mit fehlenden Werten (NaN/NA) vollständig für die jeweilige Spaltenberechnung.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "argument is not numeric or logical: returning NA",
+                                "cause": "Der übergebene Vektor x enthält Zeichenketten (Characters) oder Faktoren statt numerischer Werte.",
+                                "solution": "Vorabprüfung und Typkonvertierung via x <- as.numeric(as.character(x)) implementieren."
+                            },
+                            {
+                                "error_message": "returns NA (ohne Fehler)",
+                                "cause": "Mindestens ein Wert im Vektor ist NA und na.rm wurde weggelassen.",
+                                "solution": "na.rm = TRUE strikt erzwingen."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Quantile / Perzentile (Q1, Q3 & Median)",
+                        "must_have_packages": [
+                            "stats"
+                        ],
+                        "exact_r_code": "quantiles <- quantile(x, probs = c(0.25, 0.5, 0.75), type = 6, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "type": "6 (Gewichtung nach Hyndman-Fan Typ 6: p = k / (n + 1))",
+                            "na.rm": "TRUE"
+                        },
+                        "nice_to_have_extensions": {
+                            "custom_percentiles": "quantile(x, probs = seq(0, 1, 0.1), type = 6)"
+                        },
+                        "attention_minitab_quirks": "R nutzt standardmäßig 'type = 7'. Wenn 'type = 6' nicht explizit übergeben wird, weichen Q1, Q3 und der Interquartilsabstand (IQR) bei kleinen Stichproben signifikant von den Minitab-Kennzahlen und Boxplot-Grenzen ab.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "missing values and NaN are not allowed if 'na.rm' is FALSE",
+                                "cause": "Fehlende Datenpunkte im Vektor ohne na.rm-Aktivierung.",
+                                "solution": "na.rm = TRUE in der Agentenkette fix hinterlegen."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Schiefe (Skewness) & Wölbung (Kurtosis)",
+                        "must_have_packages": [
+                            "e1071"
+                        ],
+                        "exact_r_code": "skew_val <- e1071::skewness(x, type = 2, na.rm = TRUE); kurt_val <- e1071::kurtosis(x, type = 2, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "type": "2 (Berechnet die erwartungstreuen Schätzer für SAS/SPSS/Minitab-Kompatibilität)"
+                        },
+                        "nice_to_have_extensions": {
+                            "unbiased_sd": "Berechnung der korrigierten Standardabweichung als Basis für manuelle Validierungen."
+                        },
+                        "attention_minitab_quirks": "Minitab berechnet bei der Kurtosis stets den Kurtosis-Exzess (Normalverteilung = 0). Ohne 'type = 2' berechnet R die mathematisch verzerrte Populations-Kurtosis, was zu massiven Diskrepanzen führt.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "returns NaN or Division by Zero",
+                                "cause": "Die Stichprobengröße ist für die Berechnungsmatrix zu klein (n < 3 für Schiefe, n < 4 für Kurtosis).",
+                                "solution": "Vorab-Guard-Check im Agenten-Backend integrieren: if(sum(!is.na(x)) < 4) return(NA)."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "2",
+                "category_name": "Hypothesentests und Verteilungen",
+                "functions": [
+                    {
+                        "name": "Normalitätstest (Anderson-Darling)",
+                        "must_have_packages": [
+                            "nortest"
+                        ],
+                        "exact_r_code": "ad_result <- nortest::ad.test(x); ad_stat <- ad_result$statistic; p_val <- ad_result$p.value",
+                        "must_have_parameters": {},
+                        "nice_to_have_extensions": {
+                            "stephens_adjustment": "Manuelle Multiplikation für modifizierte AD-Werte bei kleinen Stichproben."
+                        },
+                        "attention_minitab_quirks": "Minitab nutzt zur p-Wert-Bestimmung des Anderson-Darling-Tests die empirischen Approximationsformeln nach D'Agostino und Stephens (1986). Standard-R-Bibliotheken neigen oft zu reinen numerischen Näherungen; 'nortest' bildet die Minitab-Prüfgröße A² jedoch exakt ab.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "sample size must be greater than 7",
+                                "cause": "Der Anderson-Darling-Test benötigt eine kritische Mindestanzahl an Datenpunkten.",
+                                "solution": "Bei n <= 7 in der Agentenkette automatisch auf den Kolmogorov-Smirnov-Test oder Shapiro-Wilk ausweichen und Warnung ausgeben."
+                            },
+                            {
+                                "error_message": "data are essentially constant",
+                                "cause": "Varianz der Daten ist 0 (alle Werte im Vektor sind identisch). Die Division durch Null beim Standardisieren blockiert den Fit.",
+                                "solution": "Vorab prüfen, ob sd(x) > 0. Wenn nicht, Test überspringen und p-Wert auf NA setzen."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Ausreißertest nach Dixon",
+                        "must_have_packages": [
+                            "outliers"
+                        ],
+                        "exact_r_code": "dixon_res <- outliers::dixon.test(x, opposite = FALSE); p_val <- dixon_res$p.value",
+                        "must_have_parameters": {
+                            "opposite": "FALSE (prüft den am stärksten verdächtigen Wert)"
+                        },
+                        "nice_to_have_extensions": {
+                            "two_sided": "Aktivierung zweiseitiger kritischer Grenzen."
+                        },
+                        "attention_minitab_quirks": "Der Dixon-Test ist mathematisch exklusiv auf kleine Stichproben beschränkt. Minitab sperrt den Test im UI außerhalb dieses Fensters.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "Sample size must be between 3 and 30",
+                                "cause": "Die Stichprobengröße überschreitet 30 oder unterschreitet 3.",
+                                "solution": "Bedingten Verzweigungs-Aktor in der Agentenkette verbauen: Wenn n > 30, schalte starr auf Grubbs-Test (`grubbs.test`) um."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "14-Verteilungsidentifikation & MLE",
+                        "must_have_packages": [
+                            "MASS",
+                            "stats"
+                        ],
+                        "exact_r_code": "fit_weibull <- MASS::fitdistr(x, 'weibull'); aic_val <- AIC(fit_weibull); bic_val <- BIC(fit_weibull)",
+                        "must_have_parameters": {
+                            "densfun": "'weibull', 'lognormal', 'gamma' etc."
+                        },
+                        "nice_to_have_extensions": {
+                            "threshold_estimation": "Optimierungsschleife zur Bestimmung des Schwellenwerts (Location Parameter) für 3-Parameter-Verteilungen."
+                        },
+                        "attention_minitab_quirks": "Bei 3-Parameter-Verteilungen (z. B. 3-Param-Weibull) schätzt Minitab einen Schwellenwert (Threshold), sodass alle Daten Punkte $x_i > \text{Threshold}$ erfüllen. Wird dieser Schwellenwert in R falsch gewählt, wird die Log-Likelihood-Dichte negativ, was zum Abbruch führt.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "An appreciation of optimization: NaNs produced",
+                                "cause": "Maximum-Likelihood-Schätzer (MLE) versucht, negative Werte in einer Verteilung zu fitten, die strikt positiv definiert ist (Weibull, Lognormal).",
+                                "solution": "Vorabprüfung der Daten: Wenn min(x) <= 0, entferne diese Verteilungen aus dem Fitting-Loop oder erzwinge eine automatische Verschiebung der Daten (Data Shift)."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "3",
+                "category_name": "Qualitätswerkzeuge (Quality Tools)",
+                "functions": [
+                    {
+                        "name": "Messsystemanalyse (Gage R&R Gekreuzt)",
+                        "must_have_packages": [
+                            "SixSigma"
+                        ],
+                        "exact_r_code": "g_res <- SixSigma::ss.rr(var = Messwert, part = Teil, appr = Pruefer, data = df, alphaLim = 0.05, method = 'crossed')",
+                        "must_have_parameters": {
+                            "method": "'crossed'",
+                            "alphaLim": "0.05 (Signifikanzniveau für die Interaktion)"
+                        },
+                        "nice_to_have_extensions": {
+                            "nested_msa": "Umschaltung auf method = 'nested' für zerstörende Prüfungen."
+                        },
+                        "attention_minitab_quirks": "Minitab wendet eine feste Heuristik an: Wenn der p-Wert des Interaktionsterms (Prüfer*Teil) größer als 0,05 ist, wird dieser Term aus der Varianzmatrix geworfen (gepoolt) und das Modell ohne Interaktion neu berechnet. Zudem setzt Minitab negative Varianzkomponenten starr auf 0. R-Pakete lassen negative Varianzen oft stehen, was manuell abgefangen werden muss.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "vars must be factors",
+                                "cause": "Die Spalten für 'Teil' oder 'Prüfer' liegen als Integer oder Character vor und werden als kontinuierliche Prädiktoren fehlinterpretiert.",
+                                "solution": "Vor der Übergabe an `ss.rr` die Daten explizit konvertieren: df$Teil <- as.factor(df$Teil); df$Pruefer <- as.factor(df$Pruefer)."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Prozessfähigkeit (Cp / Cpk via Sigma Within für n = 1)",
+                        "must_have_packages": [
+                            "base",
+                            "stats"
+                        ],
+                        "exact_r_code": "moving_ranges <- abs(diff(x)); mr_bar <- mean(moving_ranges); sigma_within <- mr_bar / 1.128; Cp <- (USL - LSL) / (6 * sigma_within); Cpk <- min((USL - mean(x))/(3 * sigma_within), (mean(x) - LSL)/(3 * sigma_within))",
+                        "must_have_parameters": {
+                            "unbiasing_constant_d2": "1.128 (für eine gleitende Spannweite mit Fenster w = 2)"
+                        },
+                        "nice_to_have_extensions": {
+                            "median_moving_range": "sigma_within <- median(moving_ranges) / 0.954 # Umschaltung auf robustes Median-MR",
+                            "mssd_estimation": "mssd_val <- sum(diff(x)^2) / (2 * (length(x)-1)); sigma_within <- sqrt(mssd_val) # MSSD-Methode"
+                        },
+                        "attention_minitab_quirks": "Wird die Standardabweichung für Cp/Cpk fälschlicherweise über die Gesamtstreuung (`sd(x)`) berechnet, weicht der Wert massiv ab, sobald der Prozess Trends oder Verschiebungen aufweist. `sd(x)` entspricht in Minitab strikt dem Leistungsindex Pp/Ppk, nicht Cp/Cpk.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "replacement has length zero",
+                                "cause": "Der Datenvektor enthält nach dem Ausschließen von NAs weniger als zwei Werte. Ein Differenzenvektor (`diff(x)`) kann nicht gebildet werden.",
+                                "solution": "Abbruch-Kriterium setzen: if(length(na.omit(x)) < 2) stop('Ungenügende Datenmenge für Within-Sigma-Schätzung. Minimum 2 Datenpunkte erforderlich.')."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Nicht-Normale Prozessfähigkeit (ISO-Perzentil-Methode)",
+                        "must_have_packages": [
+                            "MASS",
+                            "stats"
+                        ],
+                        "exact_r_code": "fit <- MASS::fitdistr(x, 'weibull'); shape <- fit$estimate['shape']; scale <- fit$estimate['scale']; p_00135 <- qweibull(0.00135, shape, scale); p_50 <- qweibull(0.5, shape, scale); p_99865 <- qweibull(0.99865, shape, scale); Ppk <- min((USL - p_50)/(p_99865 - p_50), (p_50 - LSL)/(p_50 - p_00135))",
+                        "must_have_parameters": {
+                            "probs": "0.00135, 0.50, 0.99865 (Definiert die 99,73%-Grenzen des nicht-normalen Prozess-Spreads nach ISO 22514-2)"
+                        },
+                        "nice_to_have_extensions": {
+                            "confidence_intervals": "Bootstrapping-Schleifen zur Berechnung der Vertrauensbereiche von Ppk."
+                        },
+                        "attention_minitab_quirks": "Minitab setzt bei nicht-normalen Daten standardmäßig Cp/Cpk mit Pp/Ppk gleich, da eine Trennung in 'Within' und 'Overall' ohne rationale Untergruppen bei reinen Perzentilen mathematisch nicht eindeutig definiert ist.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "NaNs produced in qweibull / qlnorm",
+                                "cause": "Die geschätzten Verteilungsparameter sind aufgrund fehlerhafter MLE-Konvergenz instabil oder negativ.",
+                                "solution": "Sicherstellen, dass die Zielgrenzen (LSL/USL) und Daten rein positiv sind. Ggf. vorab einen evolutionären Optimierer zur Festlegung stabiler Startwerte für `fitdistr` vorschalten."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "4",
+                "category_name": "Regression und Korrelation",
+                "functions": [
+                    {
+                        "name": "Einfache Lineare Regression",
+                        "must_have_packages": [
+                            "stats"
+                        ],
+                        "exact_r_code": "reg_model <- lm(Y ~ X, data = df); reg_summary <- summary(reg_model); r_sq <- reg_summary$r.squared; r_sq_adj <- reg_summary$adj.r.squared",
+                        "must_have_parameters": {},
+                        "nice_to_have_extensions": {
+                            "prediction_intervals": "predict(reg_model, newdata = neue_daten, interval = 'prediction')"
+                        },
+                        "attention_minitab_quirks": "Minitab wendet bei fehlenden Werten in der Matrix ein zeilenweises Löschen (Listwise Deletion) an. Wenn X oder Y ein NA aufweist, fliegt das gesamte Paar aus der KQ-Schätzung.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "variable lengths differ (found for 'X')",
+                                "cause": "Die Vektoren für die Zielgröße Y und den Prädiktor X haben ungleiche Längen, da Daten unvollständig bereinigt wurden.",
+                                "solution": "Vor der Modellierung ein sauberes DataFrame via `df <- data.frame(Y, X); df <- na.omit(df)` aufbauen."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "5",
+                "category_name": "Varianzanalyse (ANOVA)",
+                "functions": [
+                    {
+                        "name": "Allgemeines Lineares Modell (GLM) / Typ-III-ANOVA",
+                        "must_have_packages": [
+                            "car",
+                            "stats"
+                        ],
+                        "exact_r_code": "options(contrasts = c('contr.sum', 'contr.poly')); model <- lm(Response ~ FactorA * FactorB, data = df); anova_table <- car::Anova(model, type = 'III')",
+                        "must_have_parameters": {
+                            "type": "'III' (Erzwingt adjustierte Quadratsummen)",
+                            "contrasts": "MUSS zwingend vor `lm` auf 'contr.sum' gesetzt sein"
+                        },
+                        "nice_to_have_extensions": {
+                            "post_hoc_tukey": "TukeyHSD(aov(Response ~ FactorA * FactorB, data = df))"
+                        },
+                        "attention_minitab_quirks": "R's integrierter Befehl `anova(lm(...))` berechnet standardmäßig Typ-I-Quadratsummen (sequentiell). Das bedeutet: Die Reihenfolge, in der die Faktoren in den Code geschrieben werden, verändert das Ergebnis! Minitabs GLM liefert immer Typ-III-Quadratsummen, die unabhängig von der Term-Reihenfolge sind. Die Kombination aus `car::Anova(..., type='III')` und `options(contrasts=...)` ist die einzige Möglichkeit, exakte mathematische Identität zu erzwingen.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "aliased coefficients in the model",
+                                "cause": "Perfekte Multikollinearität oder leere Kombinationen (Zellen) im Versuchsaufbau. Ein Faktor lässt sich linear komplett durch einen anderen ausdrücken.",
+                                "solution": "Überprüfung des Designs via `alias(model)`. Singuläre Terme müssen vorab algorithmisch aus der Modellgleichung entfernt werden."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "6",
+                "category_name": "Versuchsplanung (DOE)",
+                "functions": [
+                    {
+                        "name": "2-stufiger Faktorieller Versuchsplan",
+                        "must_have_packages": [
+                            "FrF2"
+                        ],
+                        "exact_r_code": "doe_plan <- FrF2::FrF2(nruns = 16, nfactors = 5, randomize = FALSE)",
+                        "must_have_parameters": {
+                            "randomize": "FALSE (Deaktiviert die Zufallsreihenfolge für deterministische Validierung)",
+                            "nruns": "Anzahl der Durchläufe (2^k-Struktur)"
+                        },
+                        "nice_to_have_extensions": {
+                            "center_points": "Hinzufügen von Zentralpunkten via Parameter ncenter = 4."
+                        },
+                        "attention_minitab_quirks": "Minitab generiert faktorielle Versuchspläne strikt nach dem Prinzip der 'Minimum Aberration' und gibt sie standardmäßig in der mathematischen Yates-Standardreihenfolge aus. In R muss `randomize = FALSE` erzwungen werden, damit die Zeilenstruktur im Excel-Export 1:1 mit Minitab übereinstimmt.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "design rules violated / design not available",
+                                "cause": "Die gewählte Kombination aus Durchläufen (nruns) und Faktoren ist mathematisch unmöglich (z. B. 5 Faktoren in 4 Durchläufen).",
+                                "solution": "Validierungs-Matrix im Agenten hinterlegen, die nur gültige orthogonale Arrays zulässt (z. B. nruns muss eine Zweierpotenz sein: 4, 8, 16, 32, 64)."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "7",
+                "category_name": "Regelkarten (SPC)",
+                "functions": [
+                    {
+                        "name": "I-MR Kontrollkarte & Nelson-Regeln",
+                        "must_have_packages": [
+                            "qcc"
+                        ],
+                        "exact_r_code": "library(qcc); i_chart <- qcc(df$data, type = 'xbar.one', plot = FALSE); cl_i <- i_chart$center; ucl_i <- i_chart$limits[2]; lcl_i <- i_chart$limits[1]",
+                        "must_have_parameters": {
+                            "type": "'xbar.one' (Spezifischer Typ für Einzelwerte in qcc)"
+                        },
+                        "nice_to_have_extensions": {
+                            "nelson_test_2": "r_runs <- rle(df$data > cl_i); violations <- any(r_runs$lengths >= 9) # Nelson-Test 2 Skript"
+                        },
+                        "attention_minitab_quirks": "Minitab berechnet Kontrolllimits standardmäßig mit einer exakten Unverzerrungskonstante. Für die gleitende Spannweite (Fenster w=2) ist UCL_MR = D4 * MR_bar (mit D4 = 3,267). Weichen die Limit-Faktoren ab, schlagen automatisierte Qualitäts-Alarme falsch an.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "invalid plotting type",
+                                "cause": "Es wurde versucht, Untergruppen-Operationen auf einen Einzelwert-Vektor anzuwenden.",
+                                "solution": "Überprüfen Sie die Dimension der Eingabe. Wenn Untergruppengröße = 1, zwingend type = 'xbar.one' setzen; für n > 1 type = 'xbar' wählen."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "8",
+                "category_name": "Weitere Analysebereiche (Zuverlässigkeit)",
+                "functions": [
+                    {
+                        "name": "Weibull-Lebensdaueranalyse (Zensierte Daten)",
+                        "must_have_packages": [
+                            "survival",
+                            "SurvRegCensCov"
+                        ],
+                        "exact_r_code": "surv_obj <- survival::Surv(time = df$time, event = df$status); aft_model <- survival::survreg(surv_obj ~ 1, dist = 'weibull'); converted_params <- SurvRegCensCov::ConvertWeibull(aft_model); minitab_shape <- converted_params$shape; minitab_scale <- converted_params$scale",
+                        "must_have_parameters": {
+                            "dist": "'weibull'"
+                        },
+                        "nice_to_have_extensions": {
+                            "confidence_bounds": "Berechnung der asymptotischen Konfidenzintervalle für Form und Skala."
+                        },
+                        "attention_minitab_quirks": "CRITICAL AGENT TRAP: R's `survival::survreg` schätzt standardmäßig ein beschleunigtes Ausfallzeitmodell (Accelerated Failure Time, AFT). Die Koeffizienten im R-Output entsprechen der AFT-Logik (Intercept $\mu$ und Scale $\sigma$ der Log-Zeit). Minitab gibt jedoch die klassischen physikalischen Parameter der Weibull-Verteilung aus: Formparameter (Shape $\beta$) und Skalenparameter (Scale $\alpha$). Der Agent läuft in eine kritische Falle, wenn er diese Werte unkonvertiert übernimmt. Die Transformation lautet: $\beta = 1/\sigma$ und $\alpha = \exp(\mu)$. Der Aufruf von `SurvRegCensCov::ConvertWeibull` führt diese Entzerrung exakt durch.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "Invalid status values",
+                                "cause": "Der Status-Vektor ('event') enthält ungültige Werte außerhalb der Binär-Logik (0 = zensiert, 1 = Ausfall).",
+                                "solution": "Erzwingen Sie eine strenge Vorab-Bereinigung und stellen Sie sicher, dass der Vektor als logischer oder binärer Integer vorliegt: df$status <- as.integer(df$status == 1)."
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

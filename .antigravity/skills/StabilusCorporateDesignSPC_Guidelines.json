@@ -1,0 +1,173 @@
+{
+    "metadata": {
+        "companyName": "Stabilus",
+        "domain": "stabilus.com",
+        "topic": "Corporate Design & SPC Visualization Guidelines",
+        "description": "Erweiterte Wissensbasis, die das Stabilus Web-Corporate-Design mit den funktionalen Visualisierungsstandards für statistische Prozesskontrolle (SPC) nach AIAG/VDA kombiniert.",
+        "lastUpdated": "2026-05-19T09:15:00Z"
+    },
+    "brandColors": {
+        "primary": [
+            {
+                "name": "Stabilus Blue",
+                "hex": "#004B87",
+                "usage": "Brand logo, primary buttons, headers, accents, SPC in-control data points"
+            },
+            {
+                "name": "Industrial Black",
+                "hex": "#1A1A1A",
+                "usage": "Primary body text, dark section backgrounds, SPC center lines"
+            },
+            {
+                "name": "Clean White",
+                "hex": "#FFFFFF",
+                "usage": "General background, inverse text on dark elements"
+            }
+        ],
+        "secondary": [
+            {
+                "name": "Light Grey",
+                "hex": "#F4F4F4",
+                "usage": "Secondary section backgrounds, borders, input fields, SPC histogram fills"
+            },
+            {
+                "name": "Dark Grey",
+                "hex": "#4A4A4A",
+                "usage": "Secondary text, footer text, meta information, secondary grid lines"
+            }
+        ]
+    },
+    "typography": {
+        "fontFamilies": {
+            "primary": {
+                "name": "Sans-Serif Primary",
+                "stack": [
+                    "Helvetica Neue",
+                    "Arial",
+                    "sans-serif"
+                ],
+                "usage": "Headlines, navigation, body text, and chart labels"
+            }
+        },
+        "fontSizes": {
+            "body": "16px",
+            "h1": "2.5rem",
+            "h2": "2.0rem",
+            "h3": "1.75rem",
+            "h4": "1.25rem",
+            "chartAxisLabels": "12px",
+            "smallPrint": "14px"
+        },
+        "fontWeights": {
+            "light": 300,
+            "regular": 400,
+            "bold": 700
+        },
+        "lineHeights": {
+            "body": 1.5,
+            "headings": 1.2
+        }
+    },
+    "uiElements": {
+        "buttons": {
+            "primary": {
+                "backgroundColor": "#004B87",
+                "textColor": "#FFFFFF",
+                "borderRadius": "4px",
+                "padding": "12px 24px",
+                "border": "none"
+            },
+            "secondary": {
+                "backgroundColor": "transparent",
+                "textColor": "#004B87",
+                "borderRadius": "4px",
+                "padding": "12px 24px",
+                "border": "2px solid #004B87"
+            }
+        }
+    },
+    "spcVisualization": {
+        "semanticColors": {
+            "outOfControl": {
+                "name": "SPC Signal Red",
+                "hex": "#D32F2F",
+                "usage": "Data points violating AIAG/Western Electric rules, highlighting failed capability indices"
+            },
+            "warning": {
+                "name": "SPC Alert Orange",
+                "hex": "#F57C00",
+                "usage": "Data points showing early trends or shifts, marginal Cp/Cpk values"
+            },
+            "inControl": {
+                "name": "SPC Base Blue",
+                "hex": "#004B87",
+                "usage": "Stable process data points, referencing primary brand color"
+            }
+        },
+        "chartElements": {
+            "dataSeries": {
+                "markerStyle": "circle",
+                "markerSize": "6px",
+                "lineWeight": "1.5px",
+                "lineColor": "#4A4A4A"
+            },
+            "centerLineMean": {
+                "color": "#1A1A1A",
+                "lineWeight": "2px",
+                "strokeDasharray": "solid",
+                "description": "Zentrale Referenzlinie (Mean/Median) zur visuellen Orientierung der Prozesslage"
+            },
+            "controlLimitsUclLcl": {
+                "color": "#D32F2F",
+                "lineWeight": "1.5px",
+                "strokeDasharray": "5,5",
+                "description": "Statistische Eingriffsgrenzen (+/- 3 Sigma), gestrichelt zur Unterscheidung"
+            },
+            "specificationLimitsUslLsl": {
+                "color": "#1A1A1A",
+                "lineWeight": "2px",
+                "strokeDasharray": "2,4",
+                "description": "Kundenspezifische Toleranzgrenzen, gepunktet, um sie strikt von Control Limits zu trennen"
+            },
+            "gridLines": {
+                "color": "#F4F4F4",
+                "lineWeight": "1px",
+                "strokeDasharray": "solid"
+            }
+        },
+        "capabilityHistogram": {
+            "barFillColor": "#F4F4F4",
+            "barBorderColor": "#4A4A4A",
+            "barBorderWeight": "1px",
+            "densityCurveNormal": {
+                "color": "#004B87",
+                "lineWeight": "2.5px",
+                "strokeDasharray": "solid"
+            },
+            "densityCurveNonNormal": {
+                "color": "#F57C00",
+                "lineWeight": "2px",
+                "strokeDasharray": "4,4",
+                "description": "z.B. Weibull-Anpassung nach ISO 22514 bei abgelehntem Anderson-Darling Test"
+            }
+        },
+        "reportingTables": {
+            "headerBackground": "#004B87",
+            "headerTextColor": "#FFFFFF",
+            "rowBackgroundAlternate": "#F4F4F4",
+            "highlightRules": {
+                "criticalPValue": {
+                    "condition": "< 0.05",
+                    "textColor": "#D32F2F",
+                    "fontWeight": "700"
+                },
+                "incapableProcess": {
+                    "metric": "Cp/Cpk",
+                    "condition": "< 1.33",
+                    "textColor": "#D32F2F",
+                    "fontWeight": "700"
+                }
+            }
+        }
+    }
+}

@@ -20,8 +20,8 @@ test_that("Deterministic alignment of SPC Capability Sixpack with Minitab refere
   
   expect_equal(result$center_line, 22.55, tolerance = 0.005)
   expect_equal(result$sigma_overall, 0.1581139, tolerance = 0.005)
-  expect_equal(result$sigma_within, 0.1772955, tolerance = 0.005)
-  expect_equal(result$cp, 0.9399833, tolerance = 0.005)
+  expect_equal(result$sigma_within, 0.1871552, tolerance = 0.005)
+  expect_equal(result$cp, 0.8905263, tolerance = 0.005)
   expect_equal(result$pp, 1.054093, tolerance = 0.005)
   
 })

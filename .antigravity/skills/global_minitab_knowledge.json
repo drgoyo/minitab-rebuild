@@ -1,0 +1,441 @@
+{
+    "rag_knowledge_base": {
+        "domain": "Comprehensive Minitab Statistical Engine Exact Replication & PyXLL Deployment",
+        "backend_language": "R & Python Hybrid",
+        "version": "9.0_Ultimate_Orchestration_Master",
+        "framework_specification": "Entworfen für deterministische Multi-Agenten-Systeme in Antigravity zur fehlerfreien Nachbildung aller Minitab-Algorithmen und der Excel-PyXLL-Integration bis auf die letzte Nachkommastelle.",
+        "global_voraussetzungen": {
+            "r_environment_setup": "options(contrasts = c('contr.sum', 'contr.poly'))",
+            "critical_warning": "CRITICAL AGENT TRAP: Diese globale Kontrasteinstellung MUSS zwingend vor jeder Modellanpassung (lm, aov, glm) in R erzwungen werden. Andernfalls verwenden lineare S3/R6-Klassen standardmäßig Behandlungs-Kontraste ('contr.treatment'), wodurch Typ-III-Quadratsummen bei unbalancierten Datensätzen mathematisch verzerrt werden und die Minitab-Ergebnisse verfehlen."
+        },
+        "categories": [
+            {
+                "category_id": "1",
+                "category_name": "Deskriptive Statistik und Grafiken",
+                "functions": [
+                    {
+                        "name": "Arithmetischer Mittelwert (Mean)",
+                        "formula": "x_bar = (sum_{i=1}^n x_i) / n",
+                        "minitab_logik": "Standard-Mittelwert über alle gültigen Beobachtungen.",
+                        "must_have_packages": [
+                            "base"
+                        ],
+                        "exact_r_code": "mean_val <- mean(x, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "na.rm": "TRUE (Minitab führt standardmäßig ein Listwise Deletion für fehlende Werte durch)"
+                        },
+                        "alignment_note": "Identisch mit Minitab-Standard.",
+                        "attention_minitab_quirks": "Keine Abweichungen bekannt bei numerisch sauberen Vektoren.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "argument is not numeric or logical",
+                                "cause": "Nicht-numerische Zeichen im Datenvektor.",
+                                "solution": "Erzwinge Typkonvertierung via x <- as.numeric(as.character(x)) vor der Berechnung."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Stichprobenvarianz (Variance)",
+                        "formula": "s^2 = sum_{i=1}^n (x_i - x_bar)^2 / (n - 1)",
+                        "minitab_logik": "Nutzt strikt n-1 Freiheitsgrade (Bessel-Korrektur) im Nenner.",
+                        "must_have_packages": [
+                            "base"
+                        ],
+                        "exact_r_code": "var_val <- var(x, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "na.rm": "TRUE"
+                        },
+                        "alignment_note": "Exakte Übereinstimmung mit Minitabs internem Nenner.",
+                        "attention_minitab_quirks": "Darf nicht mit der Populationsvarianz (N) verwechselt werden.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "Unzureichende Freiheitsgrade",
+                                "cause": "Weniger als 2 gültige Datenpunkte im Vektor.",
+                                "solution": "Prüfe vorab length(x[!is.na(x)]) >= 2, andernfalls wirf kontrollierten Fehler aus."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Stichproben-Standardabweichung (StDev Overall)",
+                        "formula": "s = sqrt(s^2)",
+                        "minitab_logik": "Klassische empirische Standardabweichung (n-1) für die Gesamtstreuung.",
+                        "must_have_packages": [
+                            "base"
+                        ],
+                        "exact_r_code": "sd_val <- sd(x, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "na.rm": "TRUE"
+                        },
+                        "alignment_note": "Entspricht Minitabs StDev (Overall) für Pp/Ppk-Berechnungen.",
+                        "attention_minitab_quirks": "Wird im Sixpack für die Ermittlung der Gesamtfähigkeit herangezogen.",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Quantile / Perzentile (Q1, Q3 & Median)",
+                        "formula": "p_k = k / (n + 1) mit linearer Gewichtung und Interpolation",
+                        "minitab_logik": "Empirische Gewichtung nach Hyndman-Fan Typ 6 (Erwartungswert der empirischen Verteilungsfunktion).",
+                        "must_have_packages": [
+                            "stats"
+                        ],
+                        "exact_r_code": "quant_vals <- quantile(x, probs = c(0.25, 0.5, 0.75), type = 6, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "probs": "c(0.25, 0.5, 0.75)",
+                            "type": "6 (Zwingend erforderlich für Minitab-Replikation)"
+                        },
+                        "alignment_note": "Minitab nutzt exakt den Algorithmus von Typ 6.",
+                        "abweichungs_gefahr": "CRITICAL: R nutzt standardmäßig Typ 7. Bei kleinen Stichproben führt dies zu abweichenden Quartilen und falschen Boxplot-Zäunen. Typ 6 ist zwingend einzuhalten!",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Schiefe (Skewness)",
+                        "formula": "Skewness = (n / ((n-1)*(n-2))) * sum(((x_i - x_bar) / s)^3)",
+                        "minitab_logik": "Erwartungstreuer Schätzer für die Schiefe (SAS/SPSS/Minitab-Standard).",
+                        "must_have_packages": [
+                            "e1071"
+                        ],
+                        "exact_r_code": "skew_val <- e1071::skewness(x, type = 2, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "type": "2 (Erzwingt Minitab-Schätzer)"
+                        },
+                        "alignment_note": "In R muss zwingend 'type = 2' gesetzt werden.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "NaN bei kleiner Stichprobe",
+                                "cause": "n <= 2 führt zu Division durch Null im entzerrten Schätzer.",
+                                "solution": "Prüfe vorab n > 2, fange ab andernfalls gib NA zurück."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Wölbung (Kurtosis)",
+                        "formula": "Kurtosis = ((n*(n+1)) / ((n-1)*(n-2)*(n-3))) * sum(((x_i - x_bar) / s)^4) - (3*(n-1)^2) / ((n-2)*(n-3))",
+                        "minitab_logik": "Berechnet den Kurtosis-Exzess, bei dem eine perfekte Normalverteilung den Wert 0 aufweist.",
+                        "must_have_packages": [
+                            "e1071"
+                        ],
+                        "exact_r_code": "kurt_val <- e1071::kurtosis(x, type = 2, na.rm = TRUE)",
+                        "must_have_parameters": {
+                            "type": "2"
+                        },
+                        "alignment_note": "In R korrespondiert der Minitab-Exzess exakt mit 'type = 2'.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "NaN bei kleiner Stichprobe",
+                                "cause": "n <= 3 führt zu mathematischer Singularität im entzerrten Exzess-Schätzer.",
+                                "solution": "Prüfe vorab n > 3, andernfalls gib für den Exzess NA zurück."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "2",
+                "category_name": "Hypothesentests und Verteilungen",
+                "functions": [
+                    {
+                        "name": "Normalitätstest & Anpassungsgüte (Anderson-Darling)",
+                        "formula": "A^2 = -n - (1/n) * sum_{i=1}^n ((2i - 1) * ln(F(Y_i)) + (2n + 1 - 2i) * ln(1 - F(Y_i)))",
+                        "minitab_logik": "Gewichtet die Ränder (Tails) stärker. Berechnet für die Normalverteilung die angepasste Statistik: A_adj^2 = A^2 * (1 + 0.75/n + 2.25/n^2). P-Wert-Generierung basiert auf den empirischen Approximationsformeln von D'Agostino und Stephens (1986).",
+                        "must_have_packages": [
+                            "nortest"
+                        ],
+                        "exact_r_code": "ad_test <- nortest::ad.test(x)",
+                        "p_value_logic": "Liefert die modifizierte AD-Prüfgröße und p-Werte für unbekannte Parameter analog zu Minitab.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "sample size must be greater than 7",
+                                "cause": "Der AD-Test benötigt für verlässliche empirische p-Wert-Approximationen mindestens 8 Datenpunkte.",
+                                "solution": "Implementiere einen Fallback auf den Shapiro-Wilk-Test (`shapiro.test(x)`), falls n <= 7, um Abstürze im Sixpack zu verhindern."
+                            }
+                        ]
+                    },
+                    {
+                        "name": "Ausreißertest nach Grubbs",
+                        "minitab_logik": "Prüfung auf einen einzelnen extremen Ausreißer in normalverteilten Daten: G = max|x_i - x_bar| / s.",
+                        "must_have_packages": [
+                            "outliers"
+                        ],
+                        "exact_r_code": "grubbs_res <- outliers::grubbs.test(x, type = 10, opposite = FALSE)",
+                        "decision_logic": "Vergleich gegen die t-Verteilung mit n-2 Freiheitsgraden. Kritischer Wert standardmäßig bei Alpha = 0.05.",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Ausreißertest nach Dixon",
+                        "formula": "r_10 = (x_2 - x_1) / (x_n - x_1) (für den kleinsten Wert bei aufsteigender Sortierung)",
+                        "minitab_logik": "Speziell für kleine Stichproben (3 <= n <= 30). Basiert auf den mathematischen Distanzverhältnissen geordneter Datenpunkte.",
+                        "must_have_packages": [
+                            "outliers"
+                        ],
+                        "exact_r_code": "dixon_res <- outliers::dixon.test(x, opposite = FALSE)",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Grafische Boxplot-Ausreißerregel",
+                        "formula": "Untere Grenze = Q1 - 1.5 * IQR; Obere Grenze = Q3 + 1.5 * IQR",
+                        "minitab_logik": "Standardmäßige Identifikation extremer Werte zur Kennzeichnung im Plot.",
+                        "must_have_packages": [
+                            "stats"
+                        ],
+                        "exact_r_code": "outliers_vec <- boxplot.stats(x, coef = 1.5)$out",
+                        "alignment_note": "Werte außerhalb dieser Zäune werden im interaktiven Diagramm exakt als Sternchen (*) ausgegeben.",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "14-Verteilungsidentifikation & Modellauswahl",
+                        "minitab_logik": "Automatisches Testen gegen bis zu 14 Verteilungen. Priorisiert den niedrigsten AD-Wert und nutzt AIC/BIC zur Absicherung gegen Overfitting bei 3-Parameter-Modellen.",
+                        "supported_distributions": [
+                            "Normal",
+                            "Lognormal (2- & 3-Param)",
+                            "Weibull (2- & 3-Param)",
+                            "Exponential (1- & 2-Param)",
+                            "Gamma (2- & 3-Param)",
+                            "Logistic",
+                            "Loglogistic (2- & 3-Param)",
+                            "Smallest Extreme Value",
+                            "Largest Extreme Value"
+                        ],
+                        "model_selection_criteria": {
+                            "AIC": "AIC = 2k - 2*ln(L)",
+                            "BIC": "BIC = k*ln(n) - 2*ln(L)"
+                        },
+                        "must_have_packages": [
+                            "MASS",
+                            "fitter"
+                        ],
+                        "r_code_logik": "Fitte Verteilungen via MASS::fitdistr. Berechne AIC(fit) und BIC(fit) zur Absicherung, um die Gewinner-Verteilung zu bestimmen.",
+                        "possible_errors_causes_solutions": []
+                    }
+                ]
+            },
+            {
+                "category_id": "3",
+                "category_name": "Qualitätswerkzeuge (Quality Tools)",
+                "functions": [
+                    {
+                        "name": "Messsystemanalyse (Gage R&R Gekreuzt / Crossed MSA)",
+                        "minitab_logik": "ANOVA-Varianzkomponentenzerlegung (Total Variation = Var(Part) + Var(Gage)). System-Heuristik: Wenn der p-Wert für die Interaktion (Operator*Teil) > 0,05 ist, wird die Interaktion automatisch eliminiert (gepoolt). Negative Varianzkomponenten werden starr auf 0 gesetzt.",
+                        "must_have_packages": [
+                            "SixSigma"
+                        ],
+                        "exact_r_code": "rr_res <- SixSigma::ss.rr(var = Messwert, part = Teil, appr = Pruefer, data = df, alphaLim = 0.05, method = 'crossed')",
+                        "parameter": "sigma = 6 (deckt standardmäßig 99,73 % der Gauß-Streuung ab). Metrik 'ndc' (Number of Distinct Categories) = sqrt(2) * (StdDev_Part / StdDev_Gage).",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Kurzzeit-Fähigkeit (Cp / Cpk via Sigma Within für n = 1)",
+                        "formula": "Cp = (USL - LSL) / (6 * sigma_within); Cpk = min((USL - x_bar)/(3*sigma_within), (x_bar - LSL)/(3*sigma_within))",
+                        "minitab_logik": "Isoliert die zufällige Kurzzeitstreuung innerhalb rationaler Untergruppen. Bei n=1 stehen drei Schätzer zur Auswahl (Standard: Average Moving Range mit Fensterweite w=2).",
+                        "sigma_within_estimators_n_1": {
+                            "average_moving_range_default": {
+                                "formula": "sigma_within = bar(MR) / d_2(2) = (mean(abs(diff(x)))) / 1.128"
+                            },
+                            "median_moving_range": {
+                                "formula": "sigma_within = median(abs(diff(x))) / d_4(2) = median(abs(diff(x))) / 0.954",
+                                "hinweis": "Extrem robust gegen kurzfristige Ausreißertrends."
+                            },
+                            "square_root_mssd": {
+                                "formula": "sigma_within = sqrt( sum(diff(x)^2) / (2 * (length(x) - 1)) )",
+                                "hinweis": "Mean of the Squared Successive Differences. Minimiert zyklische Störeinflüsse."
+                            }
+                        },
+                        "must_have_packages": [
+                            "qcc"
+                        ],
+                        "exact_r_code": "i_chart <- qcc(data, type='xbar.one', plot=FALSE); mr_bar <- mean(i_chart$statistics); sigma_within <- mr_bar / 1.128",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Kurzzeit-Fähigkeit (Sigma Within für Untergruppen n > 1)",
+                        "formula": "sigma_within = sqrt( sum((n_i - 1) * s_i^2) / sum(n_i - 1) ) / c_4(d.f. + 1)",
+                        "minitab_logik": "Gepoolte Standardabweichung (Pooled Standard Deviation) dividiert durch die Unbiasing-Konstante c4 zur Entzerrung.",
+                        "must_have_packages": [
+                            "base",
+                            "stats"
+                        ],
+                        "r_code_logik": "Berechnung der Gruppenvarianzen, Gewichtung nach Freiheitsgraden und abschließende Division durch c4 des Gesamtfreiheitsgrades.",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Gesamtleistung (Pp / Ppk & Cpm)",
+                        "formula": "Pp = (USL - LSL) / (6 * sigma_overall); Ppk = min((USL - x_bar)/(3*sigma_overall), (x_bar - LSL)/(3*sigma_overall)); Cpm = (USL - LSL) / (6 * sqrt(sigma_overall^2 + (x_bar - Target)^2))",
+                        "minitab_logik": "Basiert auf der empirischen Gesamtstreuung (StDev Overall) über alle Datenpunkte hinweg.",
+                        "must_have_packages": [
+                            "base"
+                        ],
+                        "exact_r_code": "sigma_overall <- sd(data)",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Nicht-Normale Prozessfähigkeit (ISO-Perzentil-Methode)",
+                        "formula": "Ppk = min( (USL - P_50)/(P_0.99865 - P_50), (P_50 - LSL)/(P_50 - P_0.00135) )",
+                        "minitab_logik": "Gemäß ISO 22514-2 Quantil-Methode. Ersetzt den +/- 3-Sigma-Bereich durch die tatsächlichen Quantile (0,135% und 99,865%) der angepassten theoretischen Kurve. Der Median (P50) ersetzt den Mittelwert.",
+                        "must_have_packages": [
+                            "MASS"
+                        ],
+                        "r_code_logik": "fit <- MASS::fitdistr(data, 'weibull'); shape <- fit$estimate[1]; scale <- fit$estimate[2]; q_00135 <- qweibull(0.00135, shape, scale); q_50 <- qweibull(0.50, shape, scale); q_99865 <- qweibull(0.99865, shape, scale); Ppk <- min((USL - q_50)/(q_99865 - q_50), (q_50 - LSL)/(q_50 - q_00135))",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Box-Cox Transformation",
+                        "formula": "Wenn lambda != 0: W = (x^lambda - 1) / lambda; Wenn lambda == 0: W = ln(x)",
+                        "minitab_logik": "Optimiert Lambda im Intervall [-5, 5] über die Maximierung der Log-Likelihood bzw. Minimierung der transformierten Standardabweichung.",
+                        "must_have_packages": [
+                            "car"
+                        ],
+                        "exact_r_code": "bc <- car::powerTransform(x ~ 1, family='bcPower'); lambda <- bc$lambda; W <- (x^lambda - 1)/lambda",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Johnson-Transformation",
+                        "formula": "W = gamma + eta * ln( f((x - epsilon) / lambda) )",
+                        "minitab_logik": "Algorithmus nach Chou et al. (1998). Selektion der optimalen Familie (SB, SL, SU) durch direkte Maximierung des p-Werts im Anderson-Darling-Test.",
+                        "must_have_packages": [
+                            "jtrans"
+                        ],
+                        "exact_r_code": "jtrans_res <- jtrans(x, test = 'ad.test', z_lim = c(0.25, 1.25))",
+                        "alignment_note": "Der Parameter test = 'ad.test' muss zwingend erzwungen werden, da R-Pakete sonst fälschlicherweise Shapiro-Wilk vorziehen.",
+                        "possible_errors_causes_solutions": []
+                    }
+                ]
+            },
+            {
+                "category_id": "4",
+                "category_name": "Regression und Korrelation",
+                "functions": [
+                    {
+                        "name": "Einfache Lineare Regression",
+                        "formula": "Y = beta_0 + beta_1 * X + epsilon",
+                        "minitab_logik": "Klassische Kleinste-Quadrate-Schätzung (KQ). Ausgabe von Koeffizienten, R-Sq und R-Sq(adj).",
+                        "must_have_packages": [
+                            "stats"
+                        ],
+                        "exact_r_code": "model <- lm(Y ~ X, data = df); summary(model)",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Binäre Logistische Regression",
+                        "formula": "ln(p / (1 - p)) = beta_0 + beta_1 * X",
+                        "minitab_logik": "Newton-Raphson Maximum-Likelihood-Schätzung zur Modellierung binärer Zielgrößen.",
+                        "must_have_packages": [
+                            "stats"
+                        ],
+                        "exact_r_code": "model <- glm(Y ~ X, data = df, family = binomial(link = 'logit'))",
+                        "possible_errors_causes_solutions": []
+                    }
+                ]
+            },
+            {
+                "category_id": "5",
+                "category_name": "Varianzanalyse (ANOVA)",
+                "functions": [
+                    {
+                        "name": "Allgemeines Lineares Modell (GLM) / Mehrfache ANOVA",
+                        "minitab_logik": "Berechnet adjustierte Quadratsummen nach Typ III (Type III Sum of Squares). Die Ergebnisse sind vollkommen unabhängig von der Reihenfolge der Terme im Modell.",
+                        "must_have_packages": [
+                            "car"
+                        ],
+                        "exact_r_code": "anova_iii <- car::Anova(lm(Y ~ A * B, data = df), type = 'III')",
+                        "abweichungs_gefahr": "CRITICAL: R's Standardfunktion anova() berechnet Typ I (sequentiell). Bei unbalancierten Daten liefert dies völlig andere p-Werte! Vorab zwingend die globalen Typ-III-Kontraste aktivieren.",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Einfache Varianzanalyse (One-Way ANOVA) & Post-hoc Tukey",
+                        "formula": "F = MS_Factor / MS_Error",
+                        "minitab_logik": "Paarweise Vergleiche und simultane Konfidenzintervalle nach dem exakten Tukey-Verfahren.",
+                        "must_have_packages": [
+                            "stats"
+                        ],
+                        "exact_r_code": "anova_res <- aov(Response ~ Factor, data = df); tukey_res <- TukeyHSD(anova_res)",
+                        "possible_errors_causes_solutions": []
+                    }
+                ]
+            },
+            {
+                "category_id": "6",
+                "category_name": "Versuchsplanung (DOE)",
+                "functions": [
+                    {
+                        "name": "2-stufiger Faktorieller Versuchsplan",
+                        "minitab_logik": "Erstellung nach dem Prinzip der Minimum-Aberration. Interne Sortierung und Ausgabe in der mathematischen Yates-Standardreihenfolge. Modellierung via lm() zur Erfassung von Haupteffekten und Interaktionen.",
+                        "must_have_packages": [
+                            "FrF2"
+                        ],
+                        "exact_r_code": "design <- FrF2(nruns = 16, nfactors = 5, randomize = FALSE)",
+                        "hinweis": "Der Parameter 'randomize = FALSE' ist zwingend erforderlich, um die exakte Yates-Reihenfolge zur automatischen Validierung im Excel-Report zu wahren.",
+                        "possible_errors_causes_solutions": []
+                    }
+                ]
+            },
+            {
+                "category_id": "7",
+                "category_name": "Regelkarten (SPC)",
+                "functions": [
+                    {
+                        "name": "I-MR Kontrollkarte (Individuals and Moving Range)",
+                        "formula": "I-Chart: UCL/LCL = x_bar +/- 3*(bar(MR)/1.128); MR-Chart: UCL = D4 * bar(MR), LCL = D3 * bar(MR) (w=2: D3=0, D4=3.267)",
+                        "minitab_logik": "Prozessüberwachung basierend auf der Kurzzeitstreuung (Fenstergröße w=2). Mit d2=1.128 als Unbiasing-Konstante.",
+                        "must_have_packages": [
+                            "qcc"
+                        ],
+                        "exact_r_code": "i_chart <- qcc(df$data, type = 'xbar.one', plot = FALSE); mr_chart <- qcc(matrix(c(df$data[-nrow(df)], df$data[-1]), ncol=2), type = 'R', plot = FALSE)",
+                        "possible_errors_causes_solutions": []
+                    },
+                    {
+                        "name": "Nelson-Regeln / Western Electric Rules",
+                        "minitab_logik": "Automatisierte Musterkennung zur Identifikation spezieller Ursachen (Out-of-Control-Punkte).",
+                        "rules_specification": {
+                            "test_1": {
+                                "condition": "1 Punkt liegt mehr als 3 Sigma von der Mittellinie entfernt.",
+                                "r_logic": "any(abs(x - x_bar) > 3 * sigma_within)"
+                            },
+                            "test_2": {
+                                "condition": "9 aufeinanderfolgende Punkte liegen auf derselben Seite der Mittellinie.",
+                                "r_logic": "rle(x > x_bar) oder rle(x < x_bar) auf Längen >= 9 prüfen."
+                            },
+                            "test_3": {
+                                "condition": "6 aufeinanderfolgende Punkte steigen oder fallen kontinuierlich.",
+                                "r_logic": "Prüfe Vorzeichenkontinuität via diff(x). 5 identische Vorzeichen in Folge bedeuten einen Trend von 6 Punkten."
+                            }
+                        },
+                        "possible_errors_causes_solutions": []
+                    }
+                ]
+            },
+            {
+                "category_id": "8",
+                "category_name": "Weitere Analysebereiche (Zuverlässigkeit)",
+                "functions": [
+                    {
+                        "name": "Parametrische Lebensdaueranalyse (Weibull-Regression)",
+                        "minitab_logik": "Schätzt den klassischen Formparameter (Shape/Beta) und Skalenparameter (Scale/Alpha) unter Berücksichtigung rechtszensierter oder willkürlich zensierter Daten.",
+                        "must_have_packages": [
+                            "survival",
+                            "SurvRegCensCov"
+                        ],
+                        "exact_r_code": "model <- survival::survreg(Surv(time, status) ~ 1, dist = 'weibull'); converted <- SurvRegCensCov::ConvertWeibull(model)",
+                        "transformation_logik": "CRITICAL AGENT TRAP: R's `survival::survreg` schätzt standardmäßig ein beschleunigtes Ausfallzeitmodell (AFT). Die Koeffizienten entsprechen der AFT-Logik (Intercept mu und Scale sigma der Log-Zeit). Minitab verlangt Formparameter (Shape beta) und Skalenparameter (Scale alpha). Transformation: beta = 1/sigma und alpha = exp(mu). `ConvertWeibull` führt diese Entzerrung exakt durch.",
+                        "possible_errors_causes_solutions": [
+                            {
+                                "error_message": "Invalid status values",
+                                "cause": "Der Status-Vektor enthält ungültige Werte außerhalb der Binär-Logik (0 = zensiert, 1 = Ausfall).",
+                                "solution": "Erzwingen Sie eine strenge Vorab-Bereinigung: df$status <- as.integer(df$status == 1)."
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "category_id": "9",
+                "category_name": "Validation and Testing Gate",
+                "specifications": [
+                    {
+                        "framework_r": "testthat",
+                        "framework_python": "pytest",
+                        "tolerance_limit": "Strikte Abweichungs-Obergrenze von < 1% im direkten Vergleich aller Kennwerte (Cp, Cpk, Pp, Ppk, UCL, LCL, p-Values) gegen verifizierte Minitab-Referenzdatensätze.",
+                        "operational_logic": "Der Validierungs-Agent blockiert automatisiert jeden Code-Push auf GitHub (CI/CD-Sperre), sobald eine statistische Berechnung oder eine Vertrauensgrenze die mathematische Toleranzgrenze verletzt."
+                    }
+                ]
+            }
+        ]
+    }
+}
